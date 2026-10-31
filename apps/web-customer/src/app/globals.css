@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --brand-900:#063C2D; --brand-700:#08664B; --logo-glyph:#086B4F; --primary:#306A40;
+  --bg:#F6FAF4; --surface:#F2F4EE; --hero-mint:#B2F2BE; --hero-text:#104C24;
+  --deposit-tint:#E0F0DE; --deposit-accent:#4CAF50; --withdraw-tint:#F8ECD4;
+  --withdraw-accent:#FF9800; --selected-tint:#E4EEE2; --whatsapp:#25D366;
+  --text:#141810; --text-strong:#081C0C; --text-muted:#989C94; --outline:#707870;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font-family: Arial, sans-serif; }
+a { color: inherit; text-decoration: none; }
+button, input, select { font: inherit; }
+@layer components {
+  .container-page { @apply mx-auto w-full max-w-2xl px-5; }
+  .card { @apply rounded-card bg-surface p-5; }
+  .button-primary { @apply inline-flex min-h-12 items-center justify-center rounded-full bg-primary px-6 font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50; }
+  .button-outline { @apply inline-flex min-h-12 items-center justify-center rounded-full border border-[var(--outline)] px-6 font-semibold text-ink; }
+  .field { @apply mt-2 w-full rounded-input border border-[var(--outline)] bg-white px-4 py-3 outline-none focus:border-primary focus:ring-2 focus:ring-primary; }
+}

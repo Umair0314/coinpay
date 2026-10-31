@@ -1,0 +1,6 @@
+import Link from "next/link";
+
+export default async function LoginPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
+  const { error } = await searchParams;
+  return <main className="min-h-screen py-10"><div className="container-page"><Link href="/" className="text-sm text-primary">← CoinPay</Link><div className="mt-12"><h1 className="text-3xl font-bold">Log in</h1><p className="mt-2 text-muted">Use your verified email and password.</p>{error && <p className="mt-4 rounded-input bg-red-50 p-3 text-sm text-red-700" role="alert">{error}</p>}<form className="card mt-8 space-y-4" action="/api/auth/login" method="post"><label className="block text-sm font-semibold">Email<input className="field" name="email" type="email" required autoComplete="email" /></label><label className="block text-sm font-semibold">Password<input className="field" name="password" type="password" required autoComplete="current-password" /></label><button className="button-primary w-full" type="submit">Log in</button><Link className="block text-center text-sm text-primary" href="/forgot-password">Forgot password?</Link></form><p className="mt-6 text-center text-sm">New to CoinPay? <Link className="font-semibold text-primary" href="/register">Create an account</Link></p></div></div></main>;
+}

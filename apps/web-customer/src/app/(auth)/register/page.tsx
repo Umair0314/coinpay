@@ -1,0 +1,6 @@
+import Link from "next/link";
+
+export default async function RegisterPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
+  const { error } = await searchParams;
+  return <main className="min-h-screen py-10"><div className="container-page"><Link href="/" className="text-sm text-primary">← CoinPay</Link><div className="mt-12"><h1 className="text-3xl font-bold">Create your account</h1><p className="mt-2 text-muted">We will send a verification link to your email.</p>{error && <p className="mt-4 rounded-input bg-red-50 p-3 text-sm text-red-700" role="alert">{error}</p>}<form className="card mt-8 space-y-4" action="/api/auth/register" method="post"><label className="block text-sm font-semibold">Name<input className="field" name="name" required maxLength={100} /></label><label className="block text-sm font-semibold">Email<input className="field" name="email" type="email" required autoComplete="email" /></label><label className="block text-sm font-semibold">Password<input className="field" name="password" type="password" required minLength={8} autoComplete="new-password" /></label><button className="button-primary w-full" type="submit">Create account</button></form><p className="mt-6 text-center text-sm">Already registered? <Link className="font-semibold text-primary" href="/login">Log in</Link></p></div></div></main>;
+}
