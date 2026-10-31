@@ -18,7 +18,7 @@ export async function getCustomerSettings(): Promise<CustomerSettings> {
 export async function getCurrentUser() {
   const supabase = await createClient();
   const { data: { user }, error } = await supabase.auth.getUser();
-  if (error) throw new Error(error.message);
+  if (error && error.message !== "Auth session missing!") throw new Error(error.message);
   return user;
 }
 

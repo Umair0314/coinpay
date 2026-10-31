@@ -16,7 +16,7 @@ export const depositSchema = z.object({
   gameId: z.string().uuid(),
   playerId: z.string().trim().min(1).max(100),
   paymentDestinationId: z.string().uuid(),
-  transactionId: z.string().trim().min(1).max(120),
+  transactionId: z.string().trim().max(120).optional(),
   whatsappNumber: z.string().trim().max(30).optional(),
   proof: z.instanceof(File).refine((file) => ["image/jpeg", "image/png", "image/webp"].includes(file.type), "Upload a JPG, PNG, or WebP image").refine((file) => file.size <= 5 * 1024 * 1024, "Image must be 5 MB or smaller")
 });

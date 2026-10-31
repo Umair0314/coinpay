@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "lint": "eslint --no-config-lookup .",
+    "lint": "eslint --no-config-lookup . --ignore-pattern .next",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
