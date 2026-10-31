@@ -14,7 +14,8 @@ export async function POST(request: Request) {
   if (!allowedRequest(`register:${email}`)) return jsonResponse(request, { success: false, message: "Too many registration attempts. Try again later." }, 429);
   try {
     const supabase = await createClient();
-    const { data: signupData, error: signupError } = await supabase.auth.signUp({ email, password, options: { data: { full_name: name } } });
+    const emailRedirectTo = new URL("/auth/callback", request.url).toString();
+    const { data: signupData, error: signupError } = await supabase.auth.signUp({ email, password, options: { data: { full_name: name }, emailRedirectTo } });
     if (!signupError && signupData.user && (signupData.session || signupData.user.email_confirmed_at || signupData.user.confirmed_at)) {
       await createAdminClient().auth.admin.deleteUser(signupData.user.id);
       throw new Error("Email confirmation is disabled in Supabase. Enable Confirm email before registering.");
@@ -27,23 +28,31 @@ export async function POST(request: Request) {
 
       const isEmailConfirmed = Boolean(existingUser?.email_confirmed_at || existingUser?.confirmed_at);
       if (existingUser && !isEmailConfirmed) {
-        const { error: resendError } = await supabase.auth.resend({ type: "signup", email });
+        const { error: resendError } = await supabase.auth.resend({ type: "signup", email, options: { emailRedirectTo } });
         if (resendError) throw new Error(resendError.message);
         return isJson
-          ? jsonResponse(request, { success: true, message: "A new verification code was sent to your email." })
-          : NextResponse.redirect(new URL(`/verify?email=${encodeURIComponent(email)}`, request.url));
+          ? jsonResponse(request, { success: true, message: "A new confirmation link was sent to your email." })
+          : NextResponse.redirect(new URL("/login?registered=1", request.url), 303);
       } else {
         return isJson
           ? jsonResponse(request, { success: false, message: "This email is already registered. Log in or reset your password." }, 400)
           : NextResponse.redirect(new URL("/register?error=This+email+is+already+registered.+Log+in+or+reset+your+password.", request.url));
       }
     }
-    if (signupError) return isJson ? jsonResponse(request, { success: false, message: signupError.message }, 400) : NextResponse.redirect(new URL(`/register?error=${encodeURIComponent(signupError.message)}`, request.url));
+    if (signupError) {
+      const emailDeliveryFailed = signupError.message.toLowerCase().includes("sending confirmation email");
+      const message = emailDeliveryFailed
+        ? "We could not send the verification email. Configure Supabase Auth SMTP and try again."
+        : signupError.message;
+      return isJson
+        ? jsonResponse(request, { success: false, message }, emailDeliveryFailed ? 503 : 400)
+        : NextResponse.redirect(new URL(`/register?error=${encodeURIComponent(message)}`, request.url), { status: 303 });
+    }
   } catch (error) {
     const message = error instanceof Error ? error.message : "Signup is temporarily unavailable.";
     return isJson ? jsonResponse(request, { success: false, message }, 500) : NextResponse.redirect(new URL(`/register?error=${encodeURIComponent(message)}`, request.url));
   }
-  return isJson ? jsonResponse(request, { success: true, message: "Verification code sent to your email." }) : NextResponse.redirect(new URL(`/verify?email=${encodeURIComponent(email)}`, request.url));
+  return isJson ? jsonResponse(request, { success: true, message: "Confirmation link sent to your email." }) : NextResponse.redirect(new URL("/login?registered=1", request.url), 303);
 }
 
 export function OPTIONS(request: Request) { return optionsResponse(request); }
