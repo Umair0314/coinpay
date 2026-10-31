@@ -25,6 +25,7 @@ export const withdrawalSchema = z.object({
   amountPkr: z.coerce.number().positive().max(10000000),
   gameId: z.string().uuid(),
   playerId: z.string().trim().min(1).max(100),
+  withdrawPassword: z.string().min(1).max(200),
   payoutMethod: z.string().trim().min(1).max(80),
   accountNumber: z.string().trim().min(1).max(120),
   accountTitle: z.string().trim().min(1).max(120),
