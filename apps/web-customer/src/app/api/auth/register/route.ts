@@ -17,8 +17,9 @@ export async function POST(request: Request) {
     const emailRedirectTo = new URL("/auth/callback", request.url).toString();
     const { data: signupData, error: signupError } = await supabase.auth.signUp({ email, password, options: { data: { full_name: name }, emailRedirectTo } });
     if (!signupError && signupData.user && (signupData.session || signupData.user.email_confirmed_at || signupData.user.confirmed_at)) {
-      await createAdminClient().auth.admin.deleteUser(signupData.user.id);
-      throw new Error("Email confirmation is disabled in Supabase. Enable Confirm email before registering.");
+      return isJson
+        ? jsonResponse(request, { success: true, message: "Account created. You can now log in." })
+        : NextResponse.redirect(new URL("/login?registered=1", request.url), 303);
     }
     if (signupError?.message.toLowerCase().includes("already registered")) {
       const admin = createAdminClient();

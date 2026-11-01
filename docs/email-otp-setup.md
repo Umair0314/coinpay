@@ -1,6 +1,6 @@
 # Email confirmation setup
 
-1. In Supabase, open **Authentication → Providers → Email** and enable **Confirm email**.
+For local development without SMTP, open **Authentication → Providers → Email** and disable **Confirm email**. New users can sign up and log in immediately. Before production, enable **Confirm email** and configure SMTP below; the same application then uses confirmation links without code changes.
 2. Open **Authentication → SMTP Settings**.
 3. Configure Resend SMTP using a verified sending domain. Keep SMTP credentials in Supabase; never put them in browser environment variables.
 4. In **Authentication → Email Templates → Confirm signup**, use `supabase/email-templates/confirm-signup-link.html`.
