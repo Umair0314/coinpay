@@ -19,5 +19,5 @@ export async function POST(request: Request) {
     await supabase.storage.from("payment-proofs").remove([path]);
     return NextResponse.redirect(new URL(`/deposit/new?error=${encodeURIComponent(String(detail))}`, request.url));
   }
-  return NextResponse.redirect(new URL(`/request-submitted?id=${data.id}&type=deposit`, request.url));
+  return NextResponse.redirect(new URL(`/request-submitted?id=${data.id}&type=deposit`, request.url), 303);
 }
