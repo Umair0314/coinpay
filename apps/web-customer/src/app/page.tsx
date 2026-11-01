@@ -5,8 +5,10 @@ export default async function WelcomePage() {
   const settings = await getCustomerSettings();
   const supportHref = settings.supportWhatsappNumber ? `https://wa.me/${settings.supportWhatsappNumber}` : "/support";
 
-  return <main className="min-h-screen bg-gradient-to-b from-brand-700 to-brand-900 text-white">
-    <div className="container-page flex min-h-screen flex-col justify-between gap-12 py-8 sm:py-12">
+  return <main className="relative min-h-screen overflow-hidden bg-gradient-to-b from-brand-700 to-brand-900 text-white">
+    <div className="pointer-events-none absolute -right-20 top-28 h-56 w-56 rounded-full border-[24px] border-white/10 sm:-right-16 sm:h-72 sm:w-72" />
+    <div className="pointer-events-none absolute -left-24 bottom-32 h-64 w-64 rotate-12 rounded-[35%] border border-hero-mint/20 bg-hero-mint/5" />
+    <div className="container-page relative flex min-h-screen flex-col justify-between gap-12 py-8 sm:py-12">
       <div>
         <div className="flex items-center justify-between">
           <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-3xl text-[var(--logo-glyph)] shadow-xl shadow-black/10" aria-label="CoinPay logo">◈</div>
@@ -15,6 +17,11 @@ export default async function WelcomePage() {
         <p className="mb-4 mt-16 text-sm font-semibold uppercase tracking-[0.2em] text-white/70">Welcome to CoinPay</p>
         <h1 className="max-w-xl text-4xl font-bold leading-tight sm:text-5xl">Fast PKR deposits and withdrawals for your game coins.</h1>
         <p className="mt-5 max-w-lg text-base leading-7 text-white/75">Create an account to submit requests, upload payment proof, and follow each request until it is confirmed by our team.</p>
+        <div className="mt-8 grid max-w-xl grid-cols-3 gap-2 border-y border-white/15 py-4 sm:gap-4">
+          <div className="min-w-0"><span className="flex h-9 w-9 items-center justify-center rounded-xl bg-deposit-tint text-primary"><svg aria-hidden="true" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 3v14m0 0 5-5m-5 5-5-5M5 21h14" /></svg></span><p className="mt-2 text-xs font-semibold text-white/85 sm:text-sm">Deposit coins</p></div>
+          <div className="min-w-0 border-x border-white/15 px-2 sm:px-4"><span className="flex h-9 w-9 items-center justify-center rounded-xl bg-hero-mint text-hero-text"><svg aria-hidden="true" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 3v18m6-12.5c0-1.7-2.7-3-6-3s-6 1.3-6 3 2.7 3 6 3 6 1.3 6 3-2.7 3-6 3-6-1.3-6-3" /></svg></span><p className="mt-2 text-xs font-semibold text-white/85 sm:text-sm">Pay in PKR</p></div>
+          <div className="min-w-0"><span className="flex h-9 w-9 items-center justify-center rounded-xl bg-withdraw-tint text-[var(--withdraw-accent)]"><svg aria-hidden="true" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 21V7m0 0 5 5m-5-5-5 5M5 3h14" /></svg></span><p className="mt-2 text-xs font-semibold text-white/85 sm:text-sm">Withdraw</p></div>
+        </div>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row"><Link className="button-primary bg-white text-brand-900 shadow-lg shadow-black/10 hover:bg-white/90" href="/register">Create account</Link><Link className="button-outline border-white/60 text-white hover:bg-white/10" href="/login">Log in</Link></div>
       </div>
       <div className="rounded-card border border-white/15 bg-white/10 p-4 shadow-2xl backdrop-blur-sm">
