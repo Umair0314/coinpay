@@ -15,6 +15,9 @@ Deno.serve(async (request) => {
   const { data: rate } = await admin.from("exchange_rates").select("purchase_coins_per_pkr,min_amount_pkr,max_amount_pkr").eq("game_id", body.gameId).lte("effective_from", new Date().toISOString()).or("effective_to.is.null,effective_to.gt." + new Date().toISOString()).order("effective_from", { ascending: false }).limit(1).single();
   if (!game || !rate || Number(body.amountPkr) < Number(rate.min_amount_pkr) || (rate.max_amount_pkr && Number(body.amountPkr) > Number(rate.max_amount_pkr))) return new Response(JSON.stringify({ error: "The selected game is not available for this amount." }), { status: 400, headers: { ...cors, "Content-Type": "application/json" } });
   const { data, error } = await admin.from("deposit_requests").insert({ customer_id: user.id, game_id: body.gameId, game_name_snapshot: game.name, player_id: body.playerId, requested_amount: body.amountPkr, rate_used: rate.purchase_coins_per_pkr, calculated_coins: Number(body.amountPkr) * Number(rate.purchase_coins_per_pkr), payment_destination_id: body.paymentDestinationId, transaction_id: body.transactionId || null, whatsapp_number: null, idempotency_key: body.idempotencyKey }).select("id").single();
-  if (!error && data && body.attachmentPath) await admin.from("transaction_attachments").insert({ request_id: data.id, request_type: "deposit", customer_id: user.id, storage_path: body.attachmentPath, mime_type: "image/*" });
+  if (!error && data) {
+    if (body.attachmentPath) await admin.from("transaction_attachments").insert({ request_id: data.id, request_type: "deposit", customer_id: user.id, storage_path: body.attachmentPath, mime_type: "image/*" });
+    await admin.from("transaction_status_history").insert({ request_id: data.id, request_type: "deposit", from_status: null, to_status: "pending", actor_id: user.id, note: "Request submitted by customer." });
+  }
   return new Response(JSON.stringify(error ? { error: error.message } : data), { status: error ? 400 : 200, headers: { ...cors, "Content-Type": "application/json" } });
 });

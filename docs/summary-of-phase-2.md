@@ -17,11 +17,21 @@ Phase 2 adds a separate Next.js admin dashboard at `apps/web-admin`.
 - Staff role assignment.
 - System setting updates.
 - Reports and audit-log views.
+- Shared customer/admin request integration with initial status history, customer notifications, admin request details, and signed payment-proof access.
 - Responsive admin navigation and shared CoinPay styling.
 
 ## Database migration
 
 Apply `supabase/migrations/20261101100000_phase2_admin.sql` after the Phase 1 migrations. It creates the RBAC tables, admin policies, history tables, audit logs, permission functions, and status-processing function.
+
+Then apply `supabase/migrations/20261101220000_phase2_customer_admin_integration.sql`. This adds customer notifications, customer-readable status history, proof-file policies, and repairs Super Admin permission rows if the RBAC migration was applied in stages.
+
+After changing the Supabase migrations, deploy both Edge Functions again:
+
+```bash
+supabase functions deploy create-deposit-request
+supabase functions deploy create-withdrawal-request
+```
 
 After creating the administrator in Supabase Auth, assign the Super Admin role from the Supabase SQL editor:
 

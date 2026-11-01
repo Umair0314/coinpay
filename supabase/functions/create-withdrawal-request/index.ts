@@ -18,5 +18,8 @@ Deno.serve(async (request) => {
   const passwordBytes = new TextEncoder().encode(body.withdrawPassword);
   const passwordHash = Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", passwordBytes))).map((byte) => byte.toString(16).padStart(2, "0")).join("");
   const { data, error } = await admin.from("withdrawal_requests").insert({ customer_id: user.id, game_id: body.gameId, game_name_snapshot: game.name, player_id: body.playerId, withdraw_password_hash: passwordHash, requested_amount: body.amountPkr, rate_used: rate.withdrawal_pkr_per_coin, calculated_payout: Number(body.amountPkr) * Number(rate.withdrawal_pkr_per_coin), payout_method: body.payoutMethod, account_number: body.accountNumber, account_title: body.accountTitle, whatsapp_number: body.whatsappNumber || null, idempotency_key: body.idempotencyKey }).select("id").single();
+  if (!error && data) {
+    await admin.from("transaction_status_history").insert({ request_id: data.id, request_type: "withdrawal", from_status: null, to_status: "pending", actor_id: user.id, note: "Request submitted by customer." });
+  }
   return new Response(JSON.stringify(error ? { error: error.message } : data), { status: error ? 400 : 200, headers: { "Content-Type": "application/json" } });
 });
