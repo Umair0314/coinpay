@@ -5,7 +5,11 @@
     "dev": "npm --workspace apps/web-customer run dev",
     "build": "npm --workspace apps/web-customer run build",
     "lint": "npm --workspace apps/web-customer run lint",
-    "typecheck": "npm --workspace apps/web-customer run typecheck"
+    "typecheck": "npm --workspace apps/web-customer run typecheck",
+    "admin:dev": "npm --workspace apps/web-admin run dev",
+    "admin:build": "npm --workspace apps/web-admin run build",
+    "admin:lint": "npm --workspace apps/web-admin run lint",
+    "admin:typecheck": "npm --workspace apps/web-admin run typecheck"
   },
   "workspaces": [
     "apps/*",

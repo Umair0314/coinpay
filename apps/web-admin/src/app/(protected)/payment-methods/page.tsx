@@ -1,0 +1,7 @@
+import { requireAdmin } from "@/lib/admin";
+
+export default async function PaymentMethods() {
+  const { supabase } = await requireAdmin("payment_methods.manage");
+  const { data } = await supabase.from("payment_destinations").select("id,method,account_number,account_title,enabled,sort_order").order("sort_order");
+  return <section><h1 className="text-3xl font-bold">Payment methods</h1><p className="mt-1 text-gray-500">Customer payment destinations are managed in Supabase-backed records.</p><form action="/api/admin/payment-methods" method="post" className="card mt-6 grid gap-3 md:grid-cols-4"><input className="field" name="method" placeholder="Method" required/><input className="field" name="accountNumber" placeholder="Account number" required/><input className="field" name="accountTitle" placeholder="Account title" required/><button className="button-primary" type="submit">Add destination</button></form><div className="card mt-6 overflow-x-auto"><table className="w-full min-w-[650px] text-left text-sm"><thead><tr className="border-b text-gray-500"><th className="p-3">Method</th><th className="p-3">Account</th><th className="p-3">Title</th><th className="p-3">Enabled</th></tr></thead><tbody>{(data ?? []).map((row) => <tr className="border-b last:border-0" key={row.id}><td className="p-3">{row.method}</td><td className="p-3">{row.account_number}</td><td className="p-3">{row.account_title}</td><td className="p-3">{row.enabled ? "Yes" : "No"}</td></tr>)}</tbody></table></div></section>;
+}
