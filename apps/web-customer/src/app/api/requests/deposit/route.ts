@@ -14,6 +14,10 @@ export async function POST(request: Request) {
   if (uploadError) return NextResponse.redirect(new URL(`/deposit/new?error=${encodeURIComponent(uploadError.message)}`, request.url));
   const { proof: _proof, ...requestBody } = parsed.data;
   const { data, error } = await supabase.functions.invoke("create-deposit-request", { body: { ...requestBody, attachmentPath: path, idempotencyKey: crypto.randomUUID() } });
-  if (error || !data) return NextResponse.redirect(new URL(`/deposit/new?error=${encodeURIComponent(error?.message ?? "The request could not be submitted.")}`, request.url));
+  if (error || !data) {
+    const detail = data?.error || error?.message || "The request could not be submitted.";
+    await supabase.storage.from("payment-proofs").remove([path]);
+    return NextResponse.redirect(new URL(`/deposit/new?error=${encodeURIComponent(String(detail))}`, request.url));
+  }
   return NextResponse.redirect(new URL(`/requests/${data.id}`, request.url));
 }
