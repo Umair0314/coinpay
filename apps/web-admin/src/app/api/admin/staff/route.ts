@@ -13,7 +13,8 @@ export async function POST(request: Request) {
     return NextResponse.redirect(new URL("/staff?error=Server+invite+configuration+missing", request.url), 303);
   }
   const adminClient = createSupabaseClient(supabaseUrl, serviceKey);
-  const { data: invited, error: inviteError } = await adminClient.auth.admin.inviteUserByEmail(email);
+  const redirectTo = new URL("/auth/callback?next=/set-password", request.url).toString();
+  const { data: invited, error: inviteError } = await adminClient.auth.admin.inviteUserByEmail(email, { redirectTo });
   const error = inviteError ?? (invited.user
     ? (await adminClient.from("user_roles").upsert(
         { user_id: invited.user.id, role_id: roleId, invited_by: user.id },

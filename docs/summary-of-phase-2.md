@@ -61,6 +61,10 @@ Deploy `apps/web-admin` as its own Next.js project with:
 - `SUPABASE_SERVICE_ROLE_KEY` (server-only; required by the staff invitation route)
 
 Add the admin deployment URL to Supabase Auth redirect and site URL settings as appropriate.
+For staff invitations, add the admin callback URL
+`https://<admin-domain>/auth/callback` to Supabase Authentication URL
+Configuration → Redirect URLs. Invitations now redirect to the admin app,
+where the invited user sets a password and then enrolls in MFA.
 
 In Vercel, add these variables under the `web-admin` project for the Production
 environment, then redeploy. Do not prefix `SUPABASE_SERVICE_ROLE_KEY` with
