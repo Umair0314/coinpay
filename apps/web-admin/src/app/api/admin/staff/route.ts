@@ -69,7 +69,11 @@ export async function POST(request: Request) {
   if (!supabaseUrl || !serviceKey) {
     return NextResponse.redirect(new URL("/staff?error=Server+invite+configuration+missing", request.url), 303);
   }
-  const redirectTo = new URL("/auth/callback?next=/set-password", request.url).toString();
+  const adminAppUrl = process.env.ADMIN_APP_URL;
+  if (!adminAppUrl) {
+    return NextResponse.redirect(new URL("/staff?error=Admin+invite+URL+configuration+missing", request.url), 303);
+  }
+  const redirectTo = new URL("/auth/callback?next=/set-password", `${adminAppUrl.replace(/\/$/, "")}/`).toString();
   const { data: invited, error: inviteError } = await adminClient.auth.admin.inviteUserByEmail(email, { redirectTo });
   const error = inviteError ?? (invited.user
     ? (await adminClient.from("user_roles").upsert(

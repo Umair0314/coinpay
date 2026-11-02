@@ -59,6 +59,7 @@ Deploy `apps/web-admin` as its own Next.js project with:
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY` (server-only; required by the staff invitation route)
+- `ADMIN_APP_URL` (for example, `https://coinpay-topaz.vercel.app`)
 
 Add the admin deployment URL to Supabase Auth redirect and site URL settings as appropriate.
 For staff invitations, add the admin callback URL
