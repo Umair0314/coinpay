@@ -5,10 +5,8 @@ export default async function WelcomePage() {
   const settings = await getCustomerSettings();
   const supportHref = settings.supportWhatsappNumber ? `https://wa.me/${settings.supportWhatsappNumber}` : "/support";
 
-  return <main className="relative min-h-screen overflow-hidden bg-gradient-to-b from-brand-700 to-brand-900 text-white">
-    <div className="pointer-events-none absolute -right-20 top-28 h-56 w-56 rounded-full border-[24px] border-white/10 sm:-right-16 sm:h-72 sm:w-72" />
-    <div className="pointer-events-none absolute -left-24 bottom-32 h-64 w-64 rotate-12 rounded-[35%] border border-hero-mint/20 bg-hero-mint/5" />
-    <div className="container-page relative flex min-h-screen flex-col justify-between gap-12 py-8 sm:py-12">
+  return <main className="min-h-screen bg-gradient-to-b from-brand-700 to-brand-900 text-white">
+    <div className="container-page flex min-h-screen flex-col justify-between gap-12 py-8 sm:py-12">
       <div>
         <div className="flex items-center justify-between">
           <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-3xl text-[var(--logo-glyph)] shadow-xl shadow-black/10" aria-label="CoinPay logo">◈</div>
