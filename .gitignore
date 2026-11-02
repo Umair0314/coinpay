@@ -14,6 +14,7 @@ build/
 .env.*
 !.env.example
 !.env.sample
+**/.env.local
 supabase/.env
 supabase/.env.*
 !supabase/functions/.env.example
@@ -45,3 +46,4 @@ Thumbs.db
 
 # Supabase local development
 .supabase/
+supabase/.temp/

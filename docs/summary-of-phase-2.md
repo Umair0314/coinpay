@@ -58,8 +58,15 @@ Deploy `apps/web-admin` as its own Next.js project with:
 
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY` (server-only; required by the staff invitation route)
 
 Add the admin deployment URL to Supabase Auth redirect and site URL settings as appropriate.
+
+In Vercel, add these variables under the `web-admin` project for the Production
+environment, then redeploy. Do not prefix `SUPABASE_SERVICE_ROLE_KEY` with
+`NEXT_PUBLIC_` or put its value in the repository. Staff invitations show
+`Server invite configuration missing` until both the URL and server key are
+available to the deployed server.
 
 ## Security note
 
