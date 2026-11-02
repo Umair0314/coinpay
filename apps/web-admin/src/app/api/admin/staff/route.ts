@@ -15,8 +15,12 @@ export async function POST(request: Request) {
   const adminClient = createSupabaseClient(supabaseUrl, serviceKey);
   const { data: invited, error: inviteError } = await adminClient.auth.admin.inviteUserByEmail(email);
   const error = inviteError ?? (invited.user
-    ? (await adminClient.from("user_roles").upsert({ user_id: invited.user.id, role_id: roleId, invited_by: user.id })).error
+    ? (await adminClient.from("user_roles").upsert(
+        { user_id: invited.user.id, role_id: roleId, invited_by: user.id },
+        { onConflict: "user_id" }
+      )).error
     : new Error("Invitation failed"));
   if (!error && user) await adminClient.from("audit_logs").insert({ actor_id: user.id, action: "staff_invited", entity_type: "user_role", after_data: { email, role_id: roleId } });
-  return NextResponse.redirect(new URL(`/staff?${error ? "error=Could+not+assign+role" : "saved=1"}`, request.url), 303);
+  const result = error ? `error=${encodeURIComponent(error.message)}` : "saved=1";
+  return NextResponse.redirect(new URL(`/staff?${result}`, request.url), 303);
 }
