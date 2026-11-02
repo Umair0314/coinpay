@@ -1,5 +1,20 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
+function bytesToBase64(bytes: Uint8Array) {
+  let binary = "";
+  bytes.forEach((byte) => { binary += String.fromCharCode(byte); });
+  return btoa(binary);
+}
+
+async function encryptPassword(password: string) {
+  const keyText = Deno.env.get("WITHDRAW_PASSWORD_ENCRYPTION_KEY");
+  if (!keyText) throw new Error("Withdrawal password encryption is not configured.");
+  const key = await crypto.subtle.importKey("raw", Uint8Array.from(atob(keyText), (char) => char.charCodeAt(0)), "AES-GCM", false, ["encrypt"]);
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const encrypted = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, new TextEncoder().encode(password)));
+  return `${bytesToBase64(iv)}.${bytesToBase64(encrypted)}`;
+}
+
 Deno.serve(async (request) => {
   if (request.method === "OPTIONS") return new Response("ok", { headers: { "Access-Control-Allow-Origin": "*" } });
   const auth = request.headers.get("Authorization");
@@ -17,7 +32,8 @@ Deno.serve(async (request) => {
   if (!game || !rate || Number(body.amountPkr) < Number(rate.min_amount_pkr) || (rate.max_amount_pkr && Number(body.amountPkr) > Number(rate.max_amount_pkr))) return new Response(JSON.stringify({ error: "The selected game is not available for this amount." }), { status: 400 });
   const passwordBytes = new TextEncoder().encode(body.withdrawPassword);
   const passwordHash = Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", passwordBytes))).map((byte) => byte.toString(16).padStart(2, "0")).join("");
-  const { data, error } = await admin.from("withdrawal_requests").insert({ customer_id: user.id, game_id: body.gameId, game_name_snapshot: game.name, player_id: body.playerId, withdraw_password_hash: passwordHash, requested_amount: body.amountPkr, rate_used: rate.withdrawal_pkr_per_coin, calculated_payout: Number(body.amountPkr) * Number(rate.withdrawal_pkr_per_coin), payout_method: body.payoutMethod, account_number: body.accountNumber, account_title: body.accountTitle, whatsapp_number: body.whatsappNumber || null, idempotency_key: body.idempotencyKey }).select("id").single();
+  const passwordEncrypted = await encryptPassword(body.withdrawPassword);
+  const { data, error } = await admin.from("withdrawal_requests").insert({ customer_id: user.id, game_id: body.gameId, game_name_snapshot: game.name, player_id: body.playerId, withdraw_password_hash: passwordHash, withdraw_password_encrypted: passwordEncrypted, requested_amount: body.amountPkr, rate_used: rate.withdrawal_pkr_per_coin, calculated_payout: Number(body.amountPkr) * Number(rate.withdrawal_pkr_per_coin), payout_method: body.payoutMethod, account_number: body.accountNumber, account_title: body.accountTitle, whatsapp_number: body.whatsappNumber || null, idempotency_key: body.idempotencyKey }).select("id").single();
   if (!error && data) {
     await admin.from("transaction_status_history").insert({ request_id: data.id, request_type: "withdrawal", from_status: null, to_status: "pending", actor_id: user.id, note: "Request submitted by customer." });
   }
