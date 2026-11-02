@@ -12,11 +12,15 @@ export async function POST(request: Request) {
       await supabase.auth.signOut();
       return NextResponse.redirect(new URL("/login?error=Verify+your+email+with+the+6-digit+code+before+logging+in.", request.url));
     }
-    const { data: profile, error: profileError } = await supabase.from("profiles").select("id").eq("id", authData.user.id).maybeSingle();
+    const { data: profile, error: profileError } = await supabase.from("profiles").select("id,blocked_at").eq("id", authData.user.id).maybeSingle();
     if (profileError) throw new Error(profileError.message);
     if (!profile) {
       await supabase.auth.signOut();
       return NextResponse.redirect(new URL("/login?error=This+user+does+not+exist.", request.url));
+    }
+    if (profile.blocked_at) {
+      await supabase.auth.signOut();
+      return NextResponse.redirect(new URL("/login?error=Your+account+is+blocked.+Contact+support.", request.url));
     }
   } catch (error) {
     const message = error instanceof Error ? error.message : "Login is temporarily unavailable.";
