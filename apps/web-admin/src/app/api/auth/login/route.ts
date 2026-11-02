@@ -10,6 +10,7 @@ export async function POST(request: Request) {
   const { data: { user } } = await supabase.auth.getUser();
   const { data: isAdmin } = await supabase.rpc("is_admin_user", { target_user: user?.id });
   if (!isAdmin) { await supabase.auth.signOut(); return NextResponse.redirect(new URL("/login?error=This+account+is+not+an+admin.", request.url), 303); }
+  if (user) await supabase.from("admin_login_events").insert({ user_id: user.id });
   if (isDevelopmentMfaBypassEnabled()) return NextResponse.redirect(new URL("/dashboard", request.url), 303);
   const { data: assurance } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
   return NextResponse.redirect(new URL(assurance?.currentLevel === "aal2" ? "/dashboard" : "/mfa", request.url), 303);
