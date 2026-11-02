@@ -39,3 +39,4 @@ begin
   return new_row;
 end;
 $$;
+grant execute on function public.admin_update_request_status(uuid, public.request_type, text, text, text) to authenticated;
