@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
 export function isDevelopmentMfaBypassEnabled() {
-  return process.env.NODE_ENV !== "production" && process.env.ADMIN_MFA_BYPASS_DEVELOPMENT === "true";
+  return process.env.ADMIN_MFA_BYPASS_DEVELOPMENT === "true";
 }
 
 export async function requireAdmin(permission?: string) {
